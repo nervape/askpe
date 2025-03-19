@@ -7,6 +7,8 @@ import { ChatMessage as ChatMessageType } from '@/lib/openrouter';
 import { ModelSelector, MODEL_OPTIONS } from './ModelSelector';
 import { Button } from './ui/button';
 import { Settings } from 'lucide-react';
+import { DEFAULT_PRESET_ID, PRESETS, Preset, getPresetById } from '@/lib/presets';
+import { PresetSelector } from './PresetSelector';
 
 // Book of Answers responses
 const BOOK_OF_ANSWERS_PROMPTS = [
@@ -23,40 +25,50 @@ const BOOK_OF_ANSWERS_PROMPTS = [
 ];
 
 interface ChatContainerProps {
-  systemPrompt: string;
+  initialSystemPrompt: string;
+  onPresetChange?: (preset: Preset) => void;
 }
 
-export function ChatContainer({ systemPrompt }: ChatContainerProps) {
+export function ChatContainer({ initialSystemPrompt, onPresetChange }: ChatContainerProps) {
   const [messages, setMessages] = useState<ChatMessageType[]>([
     {
       role: 'system',
-      content: systemPrompt
+      content: initialSystemPrompt
     }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedModel, setSelectedModel] = useState(MODEL_OPTIONS[0].id);
+  const [selectedPresetId, setSelectedPresetId] = useState(DEFAULT_PRESET_ID);
   const [showSettings, setShowSettings] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // Get current preset
+  const currentPreset = getPresetById(selectedPresetId);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
   useEffect(() => {
-    // Update the system message when the prompt changes
+    // Update the system message when the preset changes
     setMessages(prev => {
       const newMessages = [...prev];
       const systemIndex = newMessages.findIndex(msg => msg.role === 'system');
       
       if (systemIndex >= 0) {
-        newMessages[systemIndex] = { ...newMessages[systemIndex], content: systemPrompt };
+        newMessages[systemIndex] = { ...newMessages[systemIndex], content: currentPreset.systemPrompt };
       } else {
-        newMessages.unshift({ role: 'system', content: systemPrompt });
+        newMessages.unshift({ role: 'system', content: currentPreset.systemPrompt });
       }
       
       return newMessages;
     });
-  }, [systemPrompt]);
+    
+    // Notify parent component about preset change
+    if (onPresetChange) {
+      onPresetChange(currentPreset);
+    }
+  }, [currentPreset, onPresetChange]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -64,6 +76,10 @@ export function ChatContainer({ systemPrompt }: ChatContainerProps) {
 
   const handleModelChange = (modelId: string) => {
     setSelectedModel(modelId);
+  };
+  
+  const handlePresetChange = (presetId: string) => {
+    setSelectedPresetId(presetId);
   };
 
   const getRandomPrompt = () => {
@@ -132,13 +148,17 @@ export function ChatContainer({ systemPrompt }: ChatContainerProps) {
         </Button>
         {showSettings && (
           <div className="text-xs text-gray-500 dark:text-gray-400">
-            Adjust oracle settings
+            Adjust experience settings
           </div>
         )}
       </div>
       
       {showSettings && (
-        <div className="p-4 border-b border-cream-100 dark:border-gray-700 bg-white dark:bg-gray-700 transition-colors">
+        <div className="p-4 border-b border-cream-100 dark:border-gray-700 bg-white dark:bg-gray-700 transition-colors space-y-4">
+          <PresetSelector
+            selectedPresetId={selectedPresetId}
+            onPresetChange={handlePresetChange}
+          />
           <ModelSelector 
             selectedModel={selectedModel}
             onModelChange={handleModelChange}
@@ -156,7 +176,11 @@ export function ChatContainer({ systemPrompt }: ChatContainerProps) {
       </div>
       
       <div className="border-t border-cream-100 dark:border-gray-700 bg-white dark:bg-gray-700 transition-colors">
-        <ChatForm onAskForAnswer={handleAskForAnswer} isLoading={isLoading} />
+        <ChatForm 
+          onAskForAnswer={handleAskForAnswer} 
+          isLoading={isLoading} 
+          preset={currentPreset}
+        />
       </div>
     </div>
   );

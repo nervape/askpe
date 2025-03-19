@@ -3,17 +3,19 @@
 import { useState } from 'react';
 import * as Form from '@radix-ui/react-form';
 import { Sparkles, HelpCircle } from 'lucide-react';
+import { Preset } from '@/lib/presets';
 
 interface ChatFormProps {
   onAskForAnswer: () => void;
   isLoading: boolean;
+  preset: Preset;
 }
 
-export function ChatForm({ onAskForAnswer, isLoading }: ChatFormProps) {
+export function ChatForm({ onAskForAnswer, isLoading, preset }: ChatFormProps) {
   return (
     <div className="w-full flex flex-col items-center justify-center py-4">
       <p className="text-gray-600 dark:text-gray-300 text-center mb-6 italic text-sm max-w-md">
-        Focus on your question, press the button, and receive wisdom from the Ape Oracle...
+        {preset.instructionText}
       </p>
       
       <button 
@@ -28,12 +30,12 @@ export function ChatForm({ onAskForAnswer, isLoading }: ChatFormProps) {
         {isLoading ? (
           <>
             <div className="animate-spin h-5 w-5 border-2 border-gray-700 rounded-full border-t-transparent"></div>
-            Consulting the oracle...
+            {preset.loadingText}
           </>
         ) : (
           <>
             <Sparkles className="w-5 h-5" />
-            Reveal My Answer
+            {preset.buttonText}
           </>
         )}
       </button>
@@ -43,7 +45,7 @@ export function ChatForm({ onAskForAnswer, isLoading }: ChatFormProps) {
           <HelpCircle className="w-3 h-3 mr-1" />
           <span className="font-medium">How it works</span>
         </div>
-        <p>Think of a question in your mind, then press the button to receive guidance from the oracle.</p>
+        <p>Think of a question in your mind, then press the button to receive guidance.</p>
       </div>
     </div>
   );
