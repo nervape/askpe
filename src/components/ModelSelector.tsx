@@ -17,10 +17,15 @@ export interface ModelOption {
 }
 
 const MODEL_OPTIONS: ModelOption[] = [
+   { 
+    id: 'anthropic/claude-3.5-haiku', 
+    name: 'Claude 3 Haiku', 
+    description: 'Fast and efficient' 
+   },
   { 
     id: 'openai/gpt-3.5-turbo', 
     name: 'GPT-3.5 Turbo', 
-    description: 'Good balance of speed and intelligence' 
+    description: 'Can not use in China. Good balance of speed and intelligence' 
   },
   { 
     id: 'openai/gpt-4', 
@@ -28,17 +33,12 @@ const MODEL_OPTIONS: ModelOption[] = [
     description: 'More powerful but slower' 
   },
   { 
-    id: 'anthropic/claude-3-haiku', 
-    name: 'Claude 3 Haiku', 
-    description: 'Fast and efficient' 
+    id: 'anthropic/claude-3.7-sonnet', 
+    name: 'Claude 3.7 Sonnet', 
+    description: 'Great but expensive' 
   },
   { 
-    id: 'anthropic/claude-3-sonnet', 
-    name: 'Claude 3 Sonnet', 
-    description: 'Balanced performance' 
-  },
-  { 
-    id: 'anthropic/claude-3-opus', 
+    id: 'anthropic/claude-3.5-opus', 
     name: 'Claude 3 Opus', 
     description: 'Most capable Claude model' 
   },
