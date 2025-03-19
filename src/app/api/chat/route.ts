@@ -3,7 +3,10 @@ import { generateChatResponse, ChatMessage } from '@/lib/openrouter';
 
 export async function POST(request: Request) {
   try {
-    const { messages } = await request.json() as { messages: ChatMessage[] };
+    const { messages, model } = await request.json() as { 
+      messages: ChatMessage[];
+      model?: string;
+    };
     
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json(
@@ -12,7 +15,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const response = await generateChatResponse(messages);
+    const response = await generateChatResponse(messages, model);
     
     if (response.error) {
       return NextResponse.json(

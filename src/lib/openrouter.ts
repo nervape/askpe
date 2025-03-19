@@ -17,7 +17,10 @@ export interface ChatMessage {
   content: string;
 }
 
-export async function generateChatResponse(messages: ChatMessage[]) {
+// Default model to use if none is specified
+const DEFAULT_MODEL = 'openai/gpt-3.5-turbo';
+
+export async function generateChatResponse(messages: ChatMessage[], modelId?: string) {
   try {
     if (!process.env.OPENROUTER_API_KEY) {
       return {
@@ -26,10 +29,12 @@ export async function generateChatResponse(messages: ChatMessage[]) {
       };
     }
 
-    console.log('Sending request to OpenRouter with messages:', JSON.stringify(messages));
+    const model = modelId || DEFAULT_MODEL;
+    
+    console.log(`Sending request to OpenRouter with model: ${model} and messages:`, JSON.stringify(messages));
     
     const response = await openai.chat.completions.create({
-      model: 'anthropic/claude-3.7-sonnet',
+      model: model,
       messages: messages,
     });
     
