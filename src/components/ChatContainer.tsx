@@ -9,6 +9,8 @@ import { Button } from './ui/button';
 import { Settings } from 'lucide-react';
 import { DEFAULT_PRESET_ID, PRESETS, Preset, getPresetById } from '@/lib/presets';
 import { PresetSelector } from './PresetSelector';
+import { DEFAULT_LANGUAGE_ID, Language, getLanguageById, getTranslationPrompt } from '@/lib/languages';
+import { LanguageSelector } from './LanguageSelector';
 
 // Book of Answers responses
 const BOOK_OF_ANSWERS_PROMPTS = [
@@ -27,9 +29,10 @@ const BOOK_OF_ANSWERS_PROMPTS = [
 interface ChatContainerProps {
   initialSystemPrompt: string;
   onPresetChange?: (preset: Preset) => void;
+  onLanguageChange?: (language: Language) => void;
 }
 
-export function ChatContainer({ initialSystemPrompt, onPresetChange }: ChatContainerProps) {
+export function ChatContainer({ initialSystemPrompt, onPresetChange, onLanguageChange }: ChatContainerProps) {
   const [messages, setMessages] = useState<ChatMessageType[]>([
     {
       role: 'system',
@@ -39,26 +42,35 @@ export function ChatContainer({ initialSystemPrompt, onPresetChange }: ChatConta
   const [isLoading, setIsLoading] = useState(false);
   const [selectedModel, setSelectedModel] = useState(MODEL_OPTIONS[0].id);
   const [selectedPresetId, setSelectedPresetId] = useState(DEFAULT_PRESET_ID);
+  const [selectedLanguageId, setSelectedLanguageId] = useState(DEFAULT_LANGUAGE_ID);
   const [showSettings, setShowSettings] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   // Get current preset
   const currentPreset = getPresetById(selectedPresetId);
 
+  // Get complete system prompt with translation instructions if needed
+  const getCompleteSystemPrompt = () => {
+    const basePrompt = currentPreset.systemPrompt;
+    const translationPrompt = getTranslationPrompt(selectedLanguageId);
+    return translationPrompt ? `${basePrompt}\n\n${translationPrompt}` : basePrompt;
+  };
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
   useEffect(() => {
-    // Update the system message when the preset changes
+    // Update the system message when the preset or language changes
     setMessages(prev => {
       const newMessages = [...prev];
       const systemIndex = newMessages.findIndex(msg => msg.role === 'system');
+      const completePrompt = getCompleteSystemPrompt();
       
       if (systemIndex >= 0) {
-        newMessages[systemIndex] = { ...newMessages[systemIndex], content: currentPreset.systemPrompt };
+        newMessages[systemIndex] = { ...newMessages[systemIndex], content: completePrompt };
       } else {
-        newMessages.unshift({ role: 'system', content: currentPreset.systemPrompt });
+        newMessages.unshift({ role: 'system', content: completePrompt });
       }
       
       return newMessages;
@@ -68,7 +80,12 @@ export function ChatContainer({ initialSystemPrompt, onPresetChange }: ChatConta
     if (onPresetChange) {
       onPresetChange(currentPreset);
     }
-  }, [currentPreset, onPresetChange]);
+    
+    // Notify parent component about language change
+    if (onLanguageChange) {
+      onLanguageChange(getLanguageById(selectedLanguageId));
+    }
+  }, [currentPreset, selectedLanguageId, onPresetChange, onLanguageChange]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -80,6 +97,10 @@ export function ChatContainer({ initialSystemPrompt, onPresetChange }: ChatConta
   
   const handlePresetChange = (presetId: string) => {
     setSelectedPresetId(presetId);
+  };
+
+  const handleLanguageChange = (languageId: string) => {
+    setSelectedLanguageId(languageId);
   };
 
   const getRandomPrompt = () => {
@@ -158,6 +179,10 @@ export function ChatContainer({ initialSystemPrompt, onPresetChange }: ChatConta
           <PresetSelector
             selectedPresetId={selectedPresetId}
             onPresetChange={handlePresetChange}
+          />
+          <LanguageSelector
+            selectedLanguageId={selectedLanguageId}
+            onLanguageChange={handleLanguageChange}
           />
           <ModelSelector 
             selectedModel={selectedModel}

@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react';
 import { ChatContainer } from '@/components/ChatContainer';
 import { PromptEditor } from '@/components/PromptEditor';
-import { ChevronLeft, ChevronRight, Sun, Moon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Sun, Moon, Languages } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { PRESETS, DEFAULT_PRESET_ID, getPresetById, Preset } from '@/lib/presets';
+import { DEFAULT_LANGUAGE_ID, Language, getLanguageById } from '@/lib/languages';
 
 // Get default system prompt from the default preset
 const DEFAULT_SYSTEM_PROMPT = getPresetById(DEFAULT_PRESET_ID).systemPrompt;
@@ -15,6 +16,7 @@ export default function Home() {
   const [showSidebar, setShowSidebar] = useState(false);
   const [systemPrompt, setSystemPrompt] = useState(DEFAULT_SYSTEM_PROMPT);
   const [currentPreset, setCurrentPreset] = useState<Preset>(getPresetById(DEFAULT_PRESET_ID));
+  const [currentLanguage, setCurrentLanguage] = useState<Language>(getLanguageById(DEFAULT_LANGUAGE_ID));
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -29,6 +31,10 @@ export default function Home() {
 
   const handlePresetChange = (preset: Preset) => {
     setCurrentPreset(preset);
+  };
+  
+  const handleLanguageChange = (language: Language) => {
+    setCurrentLanguage(language);
   };
 
   const toggleTheme = () => {
@@ -86,16 +92,23 @@ export default function Home() {
                 />
               </div>
             </div>
-            <div>
+            <div className="flex-1">
               <h1 className="text-xl font-bold">Ape {currentPreset.name}</h1>
               <p className="text-sm opacity-80">{currentPreset.description}</p>
             </div>
+            {currentLanguage.id !== 'en' && (
+              <div className="flex items-center bg-white/60 px-2 py-1 rounded-md text-xs text-gray-700 gap-1 border border-rose-200/40 shadow-sm">
+                <Languages className="h-3 w-3" />
+                <span>{currentLanguage.nativeName}</span>
+              </div>
+            )}
           </div>
           
           <div className="h-[calc(90vh-64px)]">
             <ChatContainer 
               initialSystemPrompt={systemPrompt} 
               onPresetChange={handlePresetChange}
+              onLanguageChange={handleLanguageChange}
             />
           </div>
         </div>
