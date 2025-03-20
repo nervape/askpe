@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { PRESETS, DEFAULT_PRESET_ID, getPresetById, Preset } from '@/lib/presets';
 import { DEFAULT_LANGUAGE_ID, Language, getLanguageById } from '@/lib/languages';
 import { FeedContainer } from '@/components/FeedContainer';
+import { MetricsButton } from '@/components/MetricsButton';
 
 // Get default system prompt from the default preset
 const DEFAULT_SYSTEM_PROMPT = getPresetById(DEFAULT_PRESET_ID).systemPrompt;
@@ -49,6 +50,9 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen bg-cream-50 dark:bg-gray-900 transition-colors">
+      {/* Metrics Button */}
+      <MetricsButton />
+      
       {/* Sidebar */}
       <div 
         className={`h-screen bg-white dark:bg-gray-800 border-r border-cream-100 dark:border-gray-700 shadow-md transition-all duration-300 flex flex-col overflow-hidden ${

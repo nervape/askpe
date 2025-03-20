@@ -38,4 +38,32 @@ export interface SharedResponseInput {
 export interface LikeInput {
   responseId: string;
   userId: string;
+}
+
+// Metrics types
+export interface MetricsData {
+  generatedCount: number;
+  sharedCount: number;
+  topLikedResponses: SharedResponse[];
+  presetDistribution: PresetMetric[];
+  languageDistribution: LanguageMetric[];
+}
+
+export interface PresetMetric {
+  presetId: string;
+  presetName: string;
+  count: number;
+}
+
+export interface LanguageMetric {
+  languageId: string;
+  languageName: string;
+  count: number;
+}
+
+export interface TopLikedResponse {
+  response: SharedResponse;
+  preset: Preset;
+  language: Language;
+  likeCount: number;
 } 

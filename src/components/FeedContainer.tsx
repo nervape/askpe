@@ -20,7 +20,7 @@ export function FeedContainer() {
       <div className="p-3 border-b border-cream-100 dark:border-gray-700 bg-white dark:bg-gray-700 flex justify-between items-center">
         <h3 className="text-sm font-medium flex items-center gap-1.5 text-gray-700 dark:text-gray-300">
           <MessageSquare className="h-3.5 w-3.5" />
-          Community Feed
+          Shared Answer Feed
         </h3>
         
         <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
