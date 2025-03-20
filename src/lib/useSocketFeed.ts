@@ -52,6 +52,7 @@ interface CustomEvent {
   data: {
     responseId: string;
     likeCount: number;
+    userId?: string; // Add userId to identify who triggered the like
   };
   timestamp: number;
 }
@@ -106,6 +107,21 @@ export function useSocketFeed() {
   // Function to like/unlike a response
   const toggleLike = useCallback(async (responseId: string) => {
     try {
+      // Optimistically update liked state for current user
+      setLikedResponseIds(prev => {
+        const newSet = new Set(prev);
+        if (newSet.has(responseId)) {
+          newSet.delete(responseId);
+        } else {
+          newSet.add(responseId);
+        }
+        
+        // Save to localStorage
+        saveUserLikedIds(newSet);
+        
+        return newSet;
+      });
+      
       const res = await fetch('/api/feed/like', {
         method: 'POST',
         headers: {
@@ -117,24 +133,27 @@ export function useSocketFeed() {
         }),
       });
       
-      if (!res.ok) throw new Error('Failed to update like');
+      if (!res.ok) {
+        // Revert optimistic update if request fails
+        setLikedResponseIds(prev => {
+          const newSet = new Set(prev);
+          if (newSet.has(responseId)) {
+            newSet.delete(responseId);
+          } else {
+            newSet.add(responseId);
+          }
+          
+          // Save to localStorage
+          saveUserLikedIds(newSet);
+          
+          return newSet;
+        });
+        throw new Error('Failed to update like');
+      }
       
       const data = await res.json();
-      
-      // Update local liked state based on server response
-      setLikedResponseIds(prev => {
-        const newSet = new Set(prev);
-        if (data.liked) {
-          newSet.add(responseId);
-        } else {
-          newSet.delete(responseId);
-        }
-        
-        // Save to localStorage
-        saveUserLikedIds(newSet);
-        
-        return newSet;
-      });
+      // Server response determines final state - no need to update likedResponseIds here
+      // as we've already optimistically updated it
       
       return data;
     } catch (error) {
@@ -197,6 +216,18 @@ export function useSocketFeed() {
               case 'like-update':
                 // Custom event for like updates
                 const customEvent = event as CustomEvent;
+                
+                // If this like-update was triggered by another user,
+                // we only update the like count, not the like state
+                if (customEvent.data.userId && customEvent.data.userId !== userId) {
+                  console.log('Like update from another user, only updating count');
+                  return prev.map(r => 
+                    r.id === customEvent.data.responseId 
+                      ? { ...r, likeCount: customEvent.data.likeCount } 
+                      : r
+                  );
+                }
+                
                 return prev.map(r => 
                   r.id === customEvent.data.responseId 
                     ? { ...r, likeCount: customEvent.data.likeCount } 

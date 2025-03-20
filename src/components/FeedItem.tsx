@@ -15,7 +15,6 @@ interface FeedItemProps {
 
 export function FeedItem({ response, onLike, isLiked }: FeedItemProps) {
   const [showOriginal, setShowOriginal] = useState(false);
-  const [isLikedState, setIsLikedState] = useState(isLiked);
   const [likeCount, setLikeCount] = useState(response.likeCount);
   const [isLiking, setIsLiking] = useState(false);
   
@@ -31,22 +30,17 @@ export function FeedItem({ response, onLike, isLiked }: FeedItemProps) {
   const preset = getPresetById(response.presetId);
   const language = getLanguageById(response.languageId);
   
-  // Update state when props change
+  // Update like count when response changes
   useEffect(() => {
-    setIsLikedState(isLiked);
     setLikeCount(response.likeCount);
-  }, [isLiked, response.likeCount]);
+  }, [response.likeCount]);
   
   const handleLike = async () => {
     if (isLiking) return;
     
     try {
       setIsLiking(true);
-      // Invoke the onLike callback but don't update UI optimistically
-      // The UI will update when the server responds via WebSocket
       await onLike();
-      
-      // No optimistic updates - UI will be updated by parent when server responds
     } catch (error) {
       console.error('Error toggling like:', error);
     } finally {
@@ -116,7 +110,7 @@ export function FeedItem({ response, onLike, isLiked }: FeedItemProps) {
               className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-rose-500 dark:hover:text-rose-300 transition-colors"
             >
               <Heart 
-                className={`h-3.5 w-3.5 ${isLikedState ? 'fill-rose-500 text-rose-500 dark:fill-rose-300 dark:text-rose-300' : ''}`} 
+                className={`h-3.5 w-3.5 ${isLiked ? 'fill-rose-500 text-rose-500 dark:fill-rose-300 dark:text-rose-300' : ''}`} 
               />
               <span>{likeCount > 0 ? likeCount : ''}</span>
             </button>

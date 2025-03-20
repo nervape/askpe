@@ -238,7 +238,9 @@ class FeedDatabase {
       type: 'like-update',
       data: {
         responseId,
-        likeCount: actualLikeCount
+        likeCount: actualLikeCount,
+        // Include userId so clients can determine if the like was from the current user
+        userId: userId
       },
       timestamp: Date.now()
     });
