@@ -9,10 +9,11 @@ services:
     environment:
       - SOCKET_PORT=3001
       - NEXT_PUBLIC_SOCKET_URL=${NEXT_PUBLIC_SOCKET_URL:-}
-    depends_on:
-      - database
+    volumes:
+      - ./prisma:/app/prisma
     networks:
       - app_network
+    command: ["./scripts/migrate.sh", "node", "server.js"]
 
 networks:
   app_network:

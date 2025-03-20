@@ -14,7 +14,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Generate Prisma client
+# Generate Prisma client at build time
 RUN npx prisma generate
 
 # Next.js collects completely anonymous telemetry data about general usage.
@@ -50,6 +50,12 @@ RUN chown -R nextjs:nodejs /app/prisma
 
 # Copy prisma schema and migrations
 COPY --chown=nextjs:nodejs prisma ./prisma/
+# Ensure prisma directory is writable
+RUN chmod -R 777 /app/prisma
+
+# Copy migration script and make it executable
+COPY --chown=nextjs:nodejs scripts/migrate.sh ./scripts/migrate.sh
+RUN chmod +x ./scripts/migrate.sh
 
 # Copy .env files (will be overridden by mounted volumes in production)
 COPY --chown=nextjs:nodejs .env* ./
