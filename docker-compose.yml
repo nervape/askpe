@@ -14,7 +14,7 @@ services:
       - ./scripts:/app/scripts
     networks:
       - app_network
-    command: ["./scripts/migrate.sh", "node", "server.js"]
+    command: ["sh", "./scripts/migrate.sh", "node", "server.js"]
 
 networks:
   app_network:
