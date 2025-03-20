@@ -10,15 +10,14 @@ services:
       - SOCKET_PORT=3001
       - NEXT_PUBLIC_SOCKET_URL=${NEXT_PUBLIC_SOCKET_URL:-}
     volumes:
-      - ./prisma:/app/prisma
-      - ./scripts:/app/scripts
+      - sqlite_data:/app/prisma
     networks:
       - app_network
-    command: ["sh", "./scripts/migrate.sh", "node", "server.js"]
 
 networks:
   app_network:
     driver: bridge
 
 volumes:
+  sqlite_data:
   postgres_data: 
