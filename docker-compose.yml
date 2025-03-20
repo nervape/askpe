@@ -11,6 +11,7 @@ services:
       - NEXT_PUBLIC_SOCKET_URL=${NEXT_PUBLIC_SOCKET_URL:-}
     volumes:
       - ./prisma:/app/prisma
+      - ./scripts:/app/scripts
     networks:
       - app_network
     command: ["./scripts/migrate.sh", "node", "server.js"]
