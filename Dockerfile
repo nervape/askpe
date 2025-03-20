@@ -54,14 +54,15 @@ COPY --chown=nextjs:nodejs prisma ./prisma/
 # Copy .env files (will be overridden by mounted volumes in production)
 COPY --chown=nextjs:nodejs .env* ./
 
+# Create a health check route
+RUN echo '{ "status": "ok" }' > /app/public/health.json
+RUN chown nextjs:nodejs /app/public/health.json
+
 USER nextjs
 
 EXPOSE 3000
 
 ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
-
-# Create a health check route
-RUN echo '{ "status": "ok" }' > /app/public/health.json
 
 CMD ["node", "server.js"] 
