@@ -160,35 +160,55 @@ export function useSocketFeed() {
       // First initialize the server by making a request to the API route
       fetch('/api/socket').then(() => {
         // Connect to WebSocket server
-        // In production with Nginx, the Socket.io server is accessible at the same host
-        // Use environment variable or default to window location
         const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || window.location.origin;
         
         console.log('Connecting to Socket.io server at:', socketUrl);
-        socket = io(socketUrl, {
+        const newSocket = io(socketUrl, {
           path: '/socket.io/',
           reconnectionAttempts: 5,
           reconnectionDelay: 1000,
           timeout: 20000,
-          transports: ['websocket', 'polling']
+          transports: ['websocket', 'polling'],
+          autoConnect: true
         });
         
-        socket.on('connect', () => {
-          console.log('Connected to WebSocket server');
+        socket = newSocket;
+        
+        // Force update connection status to reflect current state
+        setConnected(newSocket.connected);
+        
+        // Debugging
+        console.log('Socket instance created:', 
+                    { id: newSocket.id, connected: newSocket.connected });
+        
+        newSocket.on('connect', () => {
+          console.log('Connected to WebSocket server:', newSocket.id);
           setConnected(true);
+          
+          // Emit test event to ensure connection is working
+          newSocket.emit('feed-event', { type: 'ping', timestamp: Date.now() });
         });
         
-        socket.on('disconnect', () => {
+        newSocket.on('disconnect', () => {
           console.log('Disconnected from WebSocket server');
           setConnected(false);
         });
 
-        socket.on('connect_error', (error) => {
+        newSocket.on('connect_error', (error) => {
           console.error('Connection error:', error);
           setConnected(false);
         });
+
+        newSocket.on('reconnect_attempt', (attempt) => {
+          console.log(`Reconnection attempt ${attempt}`);
+        });
+
+        newSocket.on('reconnect', (attempt) => {
+          console.log(`Reconnected after ${attempt} attempts`);
+          setConnected(true);
+        });
         
-        socket.on('feed-event', (event: FeedEvent | CustomEvent) => {
+        newSocket.on('feed-event', (event: FeedEvent | CustomEvent) => {
           console.log('Received feed event:', event);
           // Update responses based on event type
           setResponses(prev => {
@@ -228,12 +248,6 @@ export function useSocketFeed() {
         console.error('Failed to initialize WebSocket:', err);
       });
     }
-    
-    // Cleanup function
-    return () => {
-      // We don't disconnect the socket on component unmount
-      // because we want to keep the connection alive for the entire session
-    };
   }, [fetchResponses]);
   
   return {

@@ -20,7 +20,7 @@ const nextConfig = {
   poweredByHeader: false,
   experimental: {
     serverActions: {
-      allowedOrigins: ['ask.nvap.app', 'localhost:3000'],
+      allowedOrigins: ['ask.nvap.app', 'localhost:3000', 'localhost:3001', 'localhost:3004'],
     },
   },
 };

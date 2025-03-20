@@ -28,9 +28,16 @@ export function FeedContainer() {
               <span>Live</span>
             </div>
           ) : (
-            <div className="flex items-center gap-1">
+            <div 
+              className="flex items-center gap-1 cursor-pointer" 
+              title="Click to force reconnect"
+              onClick={() => {
+                console.log("Attempting to reconnect socket...");
+                window.location.reload();
+              }}
+            >
               <WifiOff className="h-3 w-3 text-gray-400" />
-              <span>Offline</span>
+              <span>Offline (Click to reconnect)</span>
             </div>
           )}
         </div>

@@ -8,11 +8,13 @@ services:
       - "3004:3001"
     environment:
       - SOCKET_PORT=3001
-      - NEXT_PUBLIC_SOCKET_URL=${NEXT_PUBLIC_SOCKET_URL:-}
+      - NEXT_PUBLIC_SOCKET_URL=${NEXT_PUBLIC_SOCKET_URL:-http://localhost:3004}
+      - HOSTNAME=web
     volumes:
       - sqlite_data:/app/prisma
     networks:
       - app_network
+    restart: unless-stopped
 
 networks:
   app_network:
