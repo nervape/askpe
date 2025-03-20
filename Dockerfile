@@ -57,10 +57,6 @@ COPY --chown=nextjs:nodejs prisma ./prisma/
 # Ensure prisma directory is writable
 RUN chmod -R 777 /app/prisma
 
-# Copy migration script and make it executable
-COPY --chown=nextjs:nodejs scripts/migrate.sh ./scripts/migrate.sh
-RUN chmod +x ./scripts/migrate.sh
-
 # Copy .env files (will be overridden by mounted volumes in production)
 COPY --chown=nextjs:nodejs .env* ./
 
