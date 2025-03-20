@@ -48,6 +48,9 @@ RUN chown -R nextjs:nodejs /app/prisma
 # Copy prisma schema and migrations
 COPY --chown=nextjs:nodejs prisma ./prisma/
 
+# Copy .env files (will be overridden by mounted volumes in production)
+COPY --chown=nextjs:nodejs .env* ./
+
 USER nextjs
 
 EXPOSE 3000

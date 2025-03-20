@@ -44,4 +44,48 @@ docker-compose.yml
 # Documentation
 README.md
 LICENSE
-CHANGELOG.md 
+CHANGELOG.md
+
+# Next.js build artifacts
+.next
+out
+
+# Development files
+.git
+.github
+.husky
+.vscode
+.idea
+*.md
+!README.md
+
+# Test and coverage
+coverage
+.nyc_output
+__tests__
+test
+tests
+jest.config.js
+
+# Local environment variables - Comment out to include env files in build
+# .env*
+# !.env.example
+
+# Include only example environment variables, exclude actual .env files
+.env
+# Do not exclude .env.local as we need it for the build
+# .env.local
+.env.development
+.env.test
+
+# Misc
+.DS_Store
+*.pem
+Dockerfile
+docker-compose*
+.dockerignore
+*.log
+tmp/
+temp/
+.git*
+LICENSE 

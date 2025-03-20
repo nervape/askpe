@@ -9,17 +9,25 @@ services:
     # Not exposing ports directly to the host - Nginx will handle this
     expose:
       - "3000"
+    ports:
+      - "3000:3000"
     networks:
       - app_network
       - nginx_network
     volumes:
       - ./prisma:/app/prisma
       - db_data:/app/prisma/data
+      - ./.env.local:/app/.env.local
     environment:
       - NODE_ENV=production
       - DATABASE_URL=file:/app/prisma/data/prod.db
       # Set to placeholder hostname (will be handled by Nginx)
       - HOSTNAME="0.0.0.0"
+      # Read API keys from .env.local
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - OPENROUTER_API_URL=${OPENROUTER_API_URL}
+    env_file:
+      - .env.local
     command: >
       sh -c "
         npx prisma migrate deploy &&
