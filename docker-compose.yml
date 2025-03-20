@@ -26,8 +26,6 @@ services:
       # Read API keys from .env.local
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - OPENROUTER_API_URL=${OPENROUTER_API_URL}
-    env_file:
-      - .env.local
     command: >
       sh -c "
         npx prisma migrate deploy &&
