@@ -4,8 +4,8 @@ services:
   web:
     build: .
     ports:
-      - "3000:3000"
-      - "3001:3001"
+      - "3003:3000"
+      - "3004:3001"
     environment:
       - SOCKET_PORT=3001
       - NEXT_PUBLIC_SOCKET_URL=${NEXT_PUBLIC_SOCKET_URL:-}
