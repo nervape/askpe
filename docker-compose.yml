@@ -14,17 +14,6 @@ services:
     networks:
       - app_network
 
-  database:
-    image: postgres:14
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=askpe
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - app_network
-
 networks:
   app_network:
     driver: bridge
