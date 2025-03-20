@@ -44,6 +44,10 @@ RUN chown nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# Copy scripts directory
+COPY --chown=nextjs:nodejs scripts ./scripts/
+RUN chmod +x ./scripts/migrate.sh
+
 # Create directory for database
 RUN mkdir -p /app/prisma/data
 RUN chown -R nextjs:nodejs /app/prisma
