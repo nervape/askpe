@@ -39,6 +39,7 @@ export function ChatContainer({ initialSystemPrompt, onPresetChange, onLanguageC
       content: initialSystemPrompt
     }
   ]);
+  const [lastUserPrompt, setLastUserPrompt] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [selectedModel, setSelectedModel] = useState(MODEL_OPTIONS[0].id);
   const [selectedPresetId, setSelectedPresetId] = useState(DEFAULT_PRESET_ID);
@@ -113,6 +114,8 @@ export function ChatContainer({ initialSystemPrompt, onPresetChange, onLanguageC
     
     // Use a random prompt from our list
     const promptText = getRandomPrompt();
+    // Store the prompt for sharing purposes
+    setLastUserPrompt(promptText);
     
     // Add the "user question" as a hidden thought (not shown in the UI)
     // We'll filter these out in the message display
@@ -195,7 +198,13 @@ export function ChatContainer({ initialSystemPrompt, onPresetChange, onLanguageC
         {messages
           .filter(m => m.role !== 'system' && m.role !== 'user')
           .map((message, index) => (
-            <ChatMessage key={index} message={message} />
+            <ChatMessage 
+              key={index} 
+              message={message} 
+              presetId={selectedPresetId}
+              languageId={selectedLanguageId}
+              userPrompt={lastUserPrompt}
+            />
           ))}
         <div ref={messagesEndRef} />
       </div>

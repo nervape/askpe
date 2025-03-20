@@ -1,0 +1,41 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model SharedResponse {
+  id              String   @id @default(cuid())
+  responseContent String
+  originalContent String?
+  presetId        String
+  languageId      String
+  userPrompt      String
+  userId          String
+  timestamp       DateTime @default(now())
+  likes           Like[]
+
+  @@index([presetId])
+  @@index([languageId])
+  @@index([userId])
+}
+
+model Like {
+  id         String         @id @default(cuid())
+  userId     String
+  responseId String
+  response   SharedResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  timestamp  DateTime       @default(now())
+
+  @@unique([userId, responseId])
+  @@index([responseId])
+}

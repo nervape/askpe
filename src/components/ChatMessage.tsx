@@ -1,8 +1,16 @@
+'use client';
+
 import { ChatMessage as ChatMessageType } from '@/lib/openrouter';
 import { useState } from 'react';
+import { Share2, Check } from 'lucide-react';
+import { useCallback } from 'react';
+import { useSocketFeed } from '@/lib/useSocketFeed';
 
 interface MessageProps {
   message: ChatMessageType;
+  presetId: string;
+  languageId: string;
+  userPrompt: string;
 }
 
 // Helper function to parse translated content
@@ -25,13 +33,41 @@ function parseTranslatedContent(content: string): { original: string; translated
   return null;
 }
 
-export function ChatMessage({ message }: MessageProps) {
+export function ChatMessage({ message, presetId, languageId, userPrompt }: MessageProps) {
   // Don't display user messages
   if (message.role === 'user') return null;
   
   // Parse the content to check if it's translated
   const translatedContent = parseTranslatedContent(message.content);
   const [showOriginal, setShowOriginal] = useState(false);
+  const [isShared, setIsShared] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+  
+  // Get the share response function from the hook
+  const { shareResponse } = useSocketFeed();
+  
+  const handleShare = useCallback(async () => {
+    if (isShared || isSharing) return;
+    
+    setIsSharing(true);
+    
+    try {
+      const responseToShare = {
+        responseContent: translatedContent ? translatedContent.translated : message.content,
+        originalContent: translatedContent?.original,
+        presetId,
+        languageId,
+        userPrompt,
+      };
+      
+      await shareResponse(responseToShare);
+      setIsShared(true);
+    } catch (error) {
+      console.error('Error sharing response:', error);
+    } finally {
+      setIsSharing(false);
+    }
+  }, [message.content, presetId, languageId, userPrompt, translatedContent, isShared, isSharing, shareResponse]);
   
   return (
     <div className="flex justify-center my-6">
@@ -53,7 +89,7 @@ export function ChatMessage({ message }: MessageProps) {
                 {showOriginal ? translatedContent.original : translatedContent.translated}
               </div>
               
-              <div className="mt-4 border-t border-cream-100 dark:border-gray-600 pt-3 flex justify-end">
+              <div className="mt-4 border-t border-cream-100 dark:border-gray-600 pt-3 flex justify-between items-center">
                 <button 
                   onClick={() => setShowOriginal(!showOriginal)}
                   className="text-xs px-2 py-1 rounded bg-rose-100 dark:bg-rose-200/20 
@@ -62,6 +98,33 @@ export function ChatMessage({ message }: MessageProps) {
                 >
                   {showOriginal ? 'Show Translation' : 'Show Original'}
                 </button>
+                
+                <button
+                  onClick={handleShare}
+                  disabled={isShared || isSharing}
+                  className={`text-xs px-2 py-1 rounded flex items-center gap-1 transition-colors ${
+                    isShared 
+                      ? 'bg-green-100 dark:bg-green-200/20 text-green-600 dark:text-green-300' 
+                      : 'bg-rose-100 dark:bg-rose-200/20 text-rose-500 dark:text-rose-300 hover:bg-rose-200 dark:hover:bg-rose-200/30'
+                  }`}
+                >
+                  {isSharing ? (
+                    <span className="flex items-center gap-1">
+                      <div className="animate-spin h-3 w-3 border border-current rounded-full border-t-transparent"></div>
+                      Sharing...
+                    </span>
+                  ) : isShared ? (
+                    <span className="flex items-center gap-1">
+                      <Check className="h-3 w-3" />
+                      Shared
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1">
+                      <Share2 className="h-3 w-3" />
+                      Share
+                    </span>
+                  )}
+                </button>
               </div>
             </div>
           ) : (
@@ -69,7 +132,34 @@ export function ChatMessage({ message }: MessageProps) {
               <div className="text-lg italic text-gray-700 dark:text-gray-200">
                 {message.content}
               </div>
-              <div className="mt-4 border-t border-cream-100 dark:border-gray-600 pt-3"></div>
+              <div className="mt-4 border-t border-cream-100 dark:border-gray-600 pt-3 flex justify-end">
+                <button
+                  onClick={handleShare}
+                  disabled={isShared || isSharing}
+                  className={`text-xs px-2 py-1 rounded flex items-center gap-1 transition-colors ${
+                    isShared 
+                      ? 'bg-green-100 dark:bg-green-200/20 text-green-600 dark:text-green-300' 
+                      : 'bg-rose-100 dark:bg-rose-200/20 text-rose-500 dark:text-rose-300 hover:bg-rose-200 dark:hover:bg-rose-200/30'
+                  }`}
+                >
+                  {isSharing ? (
+                    <span className="flex items-center gap-1">
+                      <div className="animate-spin h-3 w-3 border border-current rounded-full border-t-transparent"></div>
+                      Sharing...
+                    </span>
+                  ) : isShared ? (
+                    <span className="flex items-center gap-1">
+                      <Check className="h-3 w-3" />
+                      Shared
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1">
+                      <Share2 className="h-3 w-3" />
+                      Share
+                    </span>
+                  )}
+                </button>
+              </div>
             </div>
           )}
         </div>

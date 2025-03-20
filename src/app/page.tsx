@@ -8,12 +8,14 @@ import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { PRESETS, DEFAULT_PRESET_ID, getPresetById, Preset } from '@/lib/presets';
 import { DEFAULT_LANGUAGE_ID, Language, getLanguageById } from '@/lib/languages';
+import { FeedContainer } from '@/components/FeedContainer';
 
 // Get default system prompt from the default preset
 const DEFAULT_SYSTEM_PROMPT = getPresetById(DEFAULT_PRESET_ID).systemPrompt;
 
 export default function Home() {
   const [showSidebar, setShowSidebar] = useState(false);
+  const [showFeed, setShowFeed] = useState(false);
   const [systemPrompt, setSystemPrompt] = useState(DEFAULT_SYSTEM_PROMPT);
   const [currentPreset, setCurrentPreset] = useState<Preset>(getPresetById(DEFAULT_PRESET_ID));
   const [currentLanguage, setCurrentLanguage] = useState<Language>(getLanguageById(DEFAULT_LANGUAGE_ID));
@@ -41,6 +43,10 @@ export default function Home() {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
+  const toggleFeed = () => {
+    setShowFeed(!showFeed);
+  };
+
   return (
     <main className="flex min-h-screen bg-cream-50 dark:bg-gray-900 transition-colors">
       {/* Sidebar */}
@@ -58,7 +64,7 @@ export default function Home() {
       </div>
 
       {/* Main Container */}
-      <div className="flex-1 p-4 md:p-8 relative">
+      <div className="flex-1 p-4 md:p-8 relative flex">
         {/* Sidebar Toggle Button */}
         <button
           onClick={() => setShowSidebar(!showSidebar)}
@@ -81,37 +87,58 @@ export default function Home() {
           </Button>
         )}
 
-        <div className="w-full h-[90vh] bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden mx-auto max-w-3xl border border-cream-100 dark:border-gray-700">
-          <div className="bg-gradient-to-r from-rose-200 to-rose-100 text-gray-800 p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-amber-400 to-orange-500 p-[2px] shadow-md">
-              <div className="h-full w-full rounded-full overflow-hidden bg-white flex items-center justify-center">
-                <img 
-                  src="/ape.webp" 
-                  alt="Ape Oracle" 
-                  className="w-full h-full object-cover" 
-                />
+        {/* Feed Toggle Button */}
+        <Button
+          onClick={toggleFeed}
+          size="sm"
+          variant="outline"
+          className="absolute right-16 top-4 z-10 bg-white dark:bg-gray-800 shadow-md border-cream-100 dark:border-gray-700"
+          aria-label={showFeed ? "Hide feed" : "Show feed"}
+        >
+          {showFeed ? "Hide Feed" : "Show Feed"}
+        </Button>
+        
+        {/* Main Chat Area */}
+        <div className={`transition-all duration-300 ${showFeed ? 'w-[calc(100%-280px)]' : 'w-full'}`}>
+          <div className="w-full h-[90vh] bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden mx-auto max-w-3xl border border-cream-100 dark:border-gray-700">
+            <div className="bg-gradient-to-r from-rose-200 to-rose-100 text-gray-800 p-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-amber-400 to-orange-500 p-[2px] shadow-md">
+                <div className="h-full w-full rounded-full overflow-hidden bg-white flex items-center justify-center">
+                  <img 
+                    src="/ape.webp" 
+                    alt="Ape Oracle" 
+                    className="w-full h-full object-cover" 
+                  />
+                </div>
               </div>
-            </div>
-            <div className="flex-1">
-              <h1 className="text-xl font-bold">Ape {currentPreset.name}</h1>
-              <p className="text-sm opacity-80">{currentPreset.description}</p>
-            </div>
-            {currentLanguage.id !== 'en' && (
-              <div className="flex items-center bg-white/60 px-2 py-1 rounded-md text-xs text-gray-700 gap-1 border border-rose-200/40 shadow-sm">
-                <Languages className="h-3 w-3" />
-                <span>{currentLanguage.nativeName}</span>
+              <div className="flex-1">
+                <h1 className="text-xl font-bold">Ape {currentPreset.name}</h1>
+                <p className="text-sm opacity-80">{currentPreset.description}</p>
               </div>
-            )}
-          </div>
-          
-          <div className="h-[calc(90vh-64px)]">
-            <ChatContainer 
-              initialSystemPrompt={systemPrompt} 
-              onPresetChange={handlePresetChange}
-              onLanguageChange={handleLanguageChange}
-            />
+              {currentLanguage.id !== 'en' && (
+                <div className="flex items-center bg-white/60 px-2 py-1 rounded-md text-xs text-gray-700 gap-1 border border-rose-200/40 shadow-sm">
+                  <Languages className="h-3 w-3" />
+                  <span>{currentLanguage.nativeName}</span>
+                </div>
+              )}
+            </div>
+            
+            <div className="h-[calc(90vh-64px)]">
+              <ChatContainer 
+                initialSystemPrompt={systemPrompt} 
+                onPresetChange={handlePresetChange}
+                onLanguageChange={handleLanguageChange}
+              />
+            </div>
           </div>
         </div>
+        
+        {/* Feed Area */}
+        {showFeed && (
+          <div className="w-[260px] ml-5 h-[90vh] bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-cream-100 dark:border-gray-700">
+            <FeedContainer />
+          </div>
+        )}
       </div>
     </main>
   );
