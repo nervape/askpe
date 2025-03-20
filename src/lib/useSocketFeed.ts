@@ -167,6 +167,10 @@ export function useSocketFeed() {
         console.log('Connecting to Socket.io server at:', socketUrl);
         socket = io(socketUrl, {
           path: '/socket.io/',
+          reconnectionAttempts: 5,
+          reconnectionDelay: 1000,
+          timeout: 20000,
+          transports: ['websocket', 'polling']
         });
         
         socket.on('connect', () => {
@@ -176,6 +180,11 @@ export function useSocketFeed() {
         
         socket.on('disconnect', () => {
           console.log('Disconnected from WebSocket server');
+          setConnected(false);
+        });
+
+        socket.on('connect_error', (error) => {
+          console.error('Connection error:', error);
           setConnected(false);
         });
         

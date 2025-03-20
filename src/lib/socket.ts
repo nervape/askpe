@@ -15,11 +15,19 @@ export function initSocketServer() {
         methods: ["GET", "POST"],
       },
       path: "/socket.io/",
+      transports: ['websocket', 'polling'],
     });
 
     // Handle connection event
     io.on('connection', (socket) => {
       console.log('Client connected:', socket.id);
+
+      // Handle feed event from client
+      socket.on('feed-event', (event) => {
+        console.log('Received client feed event:', event);
+        // Re-broadcast to all clients
+        io.emit('feed-event', event);
+      });
 
       // Handle disconnection
       socket.on('disconnect', () => {
@@ -49,5 +57,6 @@ export async function emitFeedEvent(event: FeedEvent) {
     io = initSocketServer();
   }
   
+  console.log('Emitting feed event:', event.type);
   io.emit('feed-event', event);
 } 
