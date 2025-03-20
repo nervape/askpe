@@ -160,7 +160,7 @@ export function useSocketFeed() {
       // First initialize the server by making a request to the API route
       fetch('/api/socket').then(() => {
         // Connect to WebSocket server
-        socket = io('http://localhost:3001');
+        socket = io('/socket.io');
         
         socket.on('connect', () => {
           console.log('Connected to WebSocket server');

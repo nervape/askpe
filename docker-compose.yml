@@ -6,11 +6,9 @@ services:
       context: .
       dockerfile: Dockerfile
     restart: always
-    # Not exposing ports directly to the host - Nginx will handle this
-    expose:
-      - "3000"
     ports:
-      - "3000:3000"
+      - "3003:3000"
+      - "3004:3001"
     networks:
       - app_network
       - nginx_network
@@ -29,12 +27,6 @@ services:
       # Read API keys from .env.local
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - OPENROUTER_API_URL=${OPENROUTER_API_URL}
-    command: >
-      sh -c "
-        npx prisma generate &&
-        npx prisma migrate deploy &&
-        npm run start
-      "
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
       interval: 30s
