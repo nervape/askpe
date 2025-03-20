@@ -22,8 +22,9 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # Local env files
-.env*
-!.env.example
+# Commenting out to include env files
+# .env*
+# !.env.example
 
 # VS Code
 .vscode
