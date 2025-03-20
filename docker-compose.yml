@@ -1,48 +1,33 @@
-version: '3.8'
+version: '3'
 
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    restart: always
+  web:
+    build: .
     ports:
-      - "3003:3000"
-      - "3004:3001"
+      - "3000:3000"
+      - "3001:3001"
+    environment:
+      - SOCKET_PORT=3001
+      - NEXT_PUBLIC_SOCKET_URL=${NEXT_PUBLIC_SOCKET_URL:-}
+    depends_on:
+      - database
     networks:
       - app_network
-      - nginx_network
-    volumes:
-      - ./prisma:/app/prisma
-      - db_data:/app/prisma/data
-      - ./.env.local:/app/.env.local
-    env_file:
-      - .env
-      - .env.local
+
+  database:
+    image: postgres:14
     environment:
-      - NODE_ENV=production
-      - DATABASE_URL=file:/app/prisma/data/prod.db
-      # Set to placeholder hostname (will be handled by Nginx)
-      - HOSTNAME=0.0.0.0
-      # Read API keys from .env.local
-      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
-      - OPENROUTER_API_URL=${OPENROUTER_API_URL}
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 20s
-    labels:
-      - "traefik.enable=true"
-      - "app=ape-oracle"
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=askpe
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app_network
 
 networks:
   app_network:
     driver: bridge
-  nginx_network:
-    external: true  # Assumes you already have an nginx network created
 
 volumes:
-  db_data:
-    driver: local 
+  postgres_data: 

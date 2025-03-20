@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { FeedEvent } from '@/lib/types';
 import { PrismaClient } from '@prisma/client';
+import { emitFeedEvent } from '@/lib/socket';
 
 // Initialize Prisma client
 const prisma = new PrismaClient();
@@ -17,6 +18,9 @@ export async function POST(request: NextRequest) {
     } else if (event.type === 'like' || event.type === 'unlike') {
       // For likes/unlikes, the like count is already updated in the like route
     }
+    
+    // Emit the event to all connected clients
+    await emitFeedEvent(event);
     
     // Return success response
     return NextResponse.json({ success: true });

@@ -1,5 +1,6 @@
 import { Server } from 'socket.io';
 import { FeedEvent } from '@/lib/types';
+import { createServer } from 'http';
 
 // Socket.io server instance
 let io: Server;
@@ -7,12 +8,13 @@ let io: Server;
 // Initialize the socket server
 export function initSocketServer() {
   if (!io) {
-    // Create a new socket.io server
+    // For Nginx integration, Socket.io should use the /socket.io path
     io = new Server({
       cors: {
         origin: "*",
         methods: ["GET", "POST"],
       },
+      path: "/socket.io/",
     });
 
     // Handle connection event
@@ -25,9 +27,17 @@ export function initSocketServer() {
       });
     });
 
-    // Start listening on a different port than the Next.js app
-    io.listen(3001);
-    console.log('Socket.io server started on port 3001');
+    // Get port from environment variable or use default 3001
+    const port = parseInt(process.env.SOCKET_PORT || '3001', 10);
+    
+    // Create HTTP server for Socket.io
+    const httpServer = createServer();
+    io.attach(httpServer);
+    
+    // Start listening on the configured port
+    httpServer.listen(port, '0.0.0.0', () => {
+      console.log(`Socket.io server started on 0.0.0.0:${port} with path /socket.io/`);
+    });
   }
   
   return io;

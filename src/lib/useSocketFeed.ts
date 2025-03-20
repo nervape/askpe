@@ -160,7 +160,14 @@ export function useSocketFeed() {
       // First initialize the server by making a request to the API route
       fetch('/api/socket').then(() => {
         // Connect to WebSocket server
-        socket = io('/socket.io');
+        // In production with Nginx, the Socket.io server is accessible at the same host
+        // Use environment variable or default to window location
+        const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || window.location.origin;
+        
+        console.log('Connecting to Socket.io server at:', socketUrl);
+        socket = io(socketUrl, {
+          path: '/socket.io/',
+        });
         
         socket.on('connect', () => {
           console.log('Connected to WebSocket server');
