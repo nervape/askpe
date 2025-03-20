@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Share2, Check } from 'lucide-react';
 import { useCallback } from 'react';
 import { useSocketFeed } from '@/lib/useSocketFeed';
+import Image from 'next/image';
 
 interface MessageProps {
   message: ChatMessageType;
@@ -34,16 +35,10 @@ function parseTranslatedContent(content: string): { original: string; translated
 }
 
 export function ChatMessage({ message, presetId, languageId, userPrompt }: MessageProps) {
-  // Don't display user messages
-  if (message.role === 'user') return null;
-  
-  // Parse the content to check if it's translated
-  const translatedContent = parseTranslatedContent(message.content);
+  // Move hooks to the top level before any conditionals
   const [showOriginal, setShowOriginal] = useState(false);
   const [isShared, setIsShared] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
-  
-  // Get the share response function from the hook
   const { shareResponse } = useSocketFeed();
   
   const handleShare = useCallback(async () => {
@@ -52,6 +47,9 @@ export function ChatMessage({ message, presetId, languageId, userPrompt }: Messa
     setIsSharing(true);
     
     try {
+      // Parse the content to check if it's translated
+      const translatedContent = parseTranslatedContent(message.content);
+      
       const responseToShare = {
         responseContent: translatedContent ? translatedContent.translated : message.content,
         originalContent: translatedContent?.original,
@@ -67,7 +65,13 @@ export function ChatMessage({ message, presetId, languageId, userPrompt }: Messa
     } finally {
       setIsSharing(false);
     }
-  }, [message.content, presetId, languageId, userPrompt, translatedContent, isShared, isSharing, shareResponse]);
+  }, [message.content, presetId, languageId, userPrompt, isShared, isSharing, shareResponse]);
+  
+  // Don't display user messages
+  if (message.role === 'user') return null;
+  
+  // Parse the content to check if it's translated
+  const translatedContent = parseTranslatedContent(message.content);
   
   return (
     <div className="flex justify-center my-6">
@@ -75,9 +79,11 @@ export function ChatMessage({ message, presetId, languageId, userPrompt }: Messa
         <div className="flex items-start mb-4">
           <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-amber-400 to-orange-500 p-[2px] mr-3">
             <div className="h-full w-full rounded-full overflow-hidden bg-white flex items-center justify-center">
-              <img 
+              <Image 
                 src="/ape.webp" 
                 alt="Ape Oracle" 
+                width={28}
+                height={28}
                 className="w-full h-full object-cover" 
               />
             </div>

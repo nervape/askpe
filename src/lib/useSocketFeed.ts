@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { SharedResponse, FeedEvent, SharedResponseInput, LikeInput } from './types';
+import { SharedResponse, FeedEvent, SharedResponseInput } from './types';
 
 // Generate a unique user ID for this client (stored in localStorage)
 function getUserId(): string {

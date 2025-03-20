@@ -1,11 +1,5 @@
-import { ChatMessage } from './openrouter';
 import { Preset } from './presets';
 import { Language } from './languages';
-import { PrismaClient } from '@prisma/client';
-
-// The Prisma model types can be imported like this
-type PrismaSharedResponse = Awaited<ReturnType<PrismaClient['sharedResponse']['findUnique']>>;
-type PrismaLike = Awaited<ReturnType<PrismaClient['like']['findUnique']>>;
 
 // Extended SharedResponse with like count
 export interface SharedResponse {

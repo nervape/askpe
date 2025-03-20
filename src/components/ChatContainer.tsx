@@ -7,7 +7,7 @@ import { ChatMessage as ChatMessageType } from '@/lib/openrouter';
 import { ModelSelector, MODEL_OPTIONS } from './ModelSelector';
 import { Button } from './ui/button';
 import { Settings } from 'lucide-react';
-import { DEFAULT_PRESET_ID, PRESETS, Preset, getPresetById } from '@/lib/presets';
+import { DEFAULT_PRESET_ID, Preset, getPresetById } from '@/lib/presets';
 import { PresetSelector } from './PresetSelector';
 import { DEFAULT_LANGUAGE_ID, Language, getLanguageById, getTranslationPrompt } from '@/lib/languages';
 import { LanguageSelector } from './LanguageSelector';
@@ -50,18 +50,18 @@ export function ChatContainer({ initialSystemPrompt, onPresetChange, onLanguageC
   // Get current preset
   const currentPreset = getPresetById(selectedPresetId);
 
-  // Get complete system prompt with translation instructions if needed
-  const getCompleteSystemPrompt = () => {
-    const basePrompt = currentPreset.systemPrompt;
-    const translationPrompt = getTranslationPrompt(selectedLanguageId);
-    return translationPrompt ? `${basePrompt}\n\n${translationPrompt}` : basePrompt;
-  };
-
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
   useEffect(() => {
+    // Define the function inside the effect to avoid dependency issues
+    const getCompleteSystemPrompt = () => {
+      const basePrompt = currentPreset.systemPrompt;
+      const translationPrompt = getTranslationPrompt(selectedLanguageId);
+      return translationPrompt ? `${basePrompt}\n\n${translationPrompt}` : basePrompt;
+    };
+    
     // Update the system message when the preset or language changes
     setMessages(prev => {
       const newMessages = [...prev];

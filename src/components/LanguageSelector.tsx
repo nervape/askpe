@@ -1,4 +1,4 @@
-import { LANGUAGES, Language } from '@/lib/languages';
+import { LANGUAGES } from '@/lib/languages';
 import * as Select from '@radix-ui/react-select';
 import { ChevronDown, Check, Languages } from 'lucide-react';
 

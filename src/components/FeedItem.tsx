@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { SharedResponse } from '@/lib/types';
-import { currentUserId, feedDb } from '@/lib/db';
 import { Heart } from 'lucide-react';
 import { getPresetById } from '@/lib/presets';
 import { getLanguageById } from '@/lib/languages';
+import Image from 'next/image';
 
 interface FeedItemProps {
   response: SharedResponse;
-  onLike: () => Promise<any>;
+  onLike: () => Promise<unknown>;
   isLiked: boolean;
 }
 
@@ -59,9 +59,11 @@ export function FeedItem({ response, onLike, isLiked }: FeedItemProps) {
       <div className="flex items-start gap-2">
         <div className="w-6 h-6 rounded-full overflow-hidden bg-gradient-to-br from-amber-400 to-orange-500 p-[1px] shrink-0">
           <div className="h-full w-full rounded-full overflow-hidden bg-white flex items-center justify-center">
-            <img 
+            <Image 
               src="/ape.webp" 
               alt="Ape Oracle" 
+              width={20}
+              height={20}
               className="w-full h-full object-cover" 
             />
           </div>

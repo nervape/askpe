@@ -1,4 +1,4 @@
-import { PRESETS, Preset } from '@/lib/presets';
+import { PRESETS } from '@/lib/presets';
 import * as Select from '@radix-ui/react-select';
 import { ChevronDown, Check } from 'lucide-react';
 

@@ -1,7 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { SharedResponse, FeedEvent } from '@/lib/types';
 import { FeedItem } from './FeedItem';
 import { MessageSquare, Wifi, WifiOff } from 'lucide-react';
 import { useSocketFeed } from '@/lib/useSocketFeed';

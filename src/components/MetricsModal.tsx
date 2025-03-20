@@ -10,7 +10,6 @@ import {
 } from './ui/sheet';
 import { useSocketFeed } from '@/lib/useSocketFeed';
 import { getPresetById } from '@/lib/presets';
-import { getLanguageById } from '@/lib/languages';
 import { MetricsData, PresetMetric } from '@/lib/types';
 
 interface MetricsModalProps {

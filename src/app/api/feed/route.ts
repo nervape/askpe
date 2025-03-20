@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { SharedResponse } from '@/lib/types';
 
@@ -15,7 +15,7 @@ type PrismaSharedResponse = {
 };
 
 // GET /api/feed - Get all shared responses
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Get all shared responses
     const responses = await prisma.sharedResponse.findMany({

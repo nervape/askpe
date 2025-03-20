@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { LikeInput, FeedEvent } from '@/lib/types';
-import { emitFeedEvent } from '../../socket/route';
+import { emitFeedEvent } from '@/lib/socket';
 
 // POST /api/feed/like - Like/unlike a response
 export async function POST(request: NextRequest) {

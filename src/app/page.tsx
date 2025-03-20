@@ -6,10 +6,11 @@ import { PromptEditor } from '@/components/PromptEditor';
 import { ChevronLeft, ChevronRight, Sun, Moon, Languages } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
-import { PRESETS, DEFAULT_PRESET_ID, getPresetById, Preset } from '@/lib/presets';
+import { DEFAULT_PRESET_ID, getPresetById, Preset } from '@/lib/presets';
 import { DEFAULT_LANGUAGE_ID, Language, getLanguageById } from '@/lib/languages';
 import { FeedContainer } from '@/components/FeedContainer';
 import { MetricsButton } from '@/components/MetricsButton';
+import Image from 'next/image';
 
 // Get default system prompt from the default preset
 const DEFAULT_SYSTEM_PROMPT = getPresetById(DEFAULT_PRESET_ID).systemPrompt;
@@ -108,9 +109,11 @@ export default function Home() {
             <div className="bg-gradient-to-r from-rose-200 to-rose-100 text-gray-800 p-4 flex items-center gap-3">
               <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-amber-400 to-orange-500 p-[2px] shadow-md">
                 <div className="h-full w-full rounded-full overflow-hidden bg-white flex items-center justify-center">
-                  <img 
+                  <Image 
                     src="/ape.webp" 
                     alt="Ape Oracle" 
+                    width={36}
+                    height={36}
                     className="w-full h-full object-cover" 
                   />
                 </div>

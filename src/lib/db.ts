@@ -5,9 +5,9 @@ const isBrowser = typeof window !== 'undefined';
 
 // Event bus for real-time updates
 class EventBus {
-  private listeners: { [key: string]: Function[] } = {};
+  private listeners: { [key: string]: ((data: unknown) => void)[] } = {};
 
-  subscribe(event: string, callback: Function) {
+  subscribe(event: string, callback: (data: unknown) => void) {
     if (!this.listeners[event]) {
       this.listeners[event] = [];
     }
@@ -15,12 +15,12 @@ class EventBus {
     return () => this.unsubscribe(event, callback);
   }
 
-  unsubscribe(event: string, callback: Function) {
+  unsubscribe(event: string, callback: (data: unknown) => void) {
     if (!this.listeners[event]) return;
     this.listeners[event] = this.listeners[event].filter(cb => cb !== callback);
   }
 
-  publish(event: string, data: any) {
+  publish(event: string, data: unknown) {
     if (!this.listeners[event]) return;
     this.listeners[event].forEach(callback => callback(data));
   }
